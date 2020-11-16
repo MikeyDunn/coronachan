@@ -34,7 +34,9 @@ function getTexasCovidTracking() {
 
 function getTexasHealthData() {
   return new Promise(resolve => {
-    https.get('https://healthdata.gov/dataset/covid-19-estimated-patient-impact-and-hospital-capacity-state/resource/82e733c6-7baa-4c65', htmlResp => {
+    const url = 'https://healthdata.gov/dataset/covid-19-estimated-patient-impact-and-hospital-capacity-state/resource/82e733c6-7baa-4c65'
+
+    https.get(url, htmlResp => {
       let htmlData = ''
 
       htmlResp.on('data', chunk => htmlData += chunk)
