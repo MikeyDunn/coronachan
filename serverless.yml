@@ -1,0 +1,15 @@
+service: corona-chan
+provider:
+  name: aws
+  runtime: nodejs12.x
+
+custom:
+  secrets: ${file(secrets.yml)}
+
+functions:
+  scrape:
+    handler: scrape.handler
+    environment: 
+      SLACK_WEBHOOK_PATH: ${self:custom.secrets.slack.webhook_path}
+    events:
+      - schedule: rate(24 hours)
