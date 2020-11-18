@@ -6,35 +6,31 @@ const https = require('https')
 const templates = require('./templates')
 
 module.exports.handler = async event => {
-  const covidOntarioTodayTrackingPromise = getOntarioCovidTracking(0)
-  const covidOntarioYesterdayTrackingPromise = getOntarioCovidTracking(1)
+  const covidOntarioTodayTrackingPromise = getOntarioCovidTracking(1)
+  const covidOntarioYesterdayTrackingPromise = getOntarioCovidTracking(2)
   const covidTrackingPromise = getTexasCovidTracking()
   const healthDataPromise = getTexasHealthData()
   const [covidTrackingData, healthData, ontarioTData, ontarioYData] = await Promise.all([covidTrackingPromise, healthDataPromise, covidOntarioTodayTrackingPromise, covidOntarioYesterdayTrackingPromise])
   const texasMessage = templates.getTexasMessage({ ...covidTrackingData, ...healthData })
-// console.log(texasMessage)
-	const ontarioMessage = templates.getOntarioMessage(ontarioTData.result, ontarioYData.result)
-//	console.log(ontarioMessage)
+  //console.log(texasMessage)
+  const ontarioMessage = templates.getOntarioMessage(ontarioTData.result, ontarioYData.result)
+  //console.log(ontarioMessage)
   await postToSlack(texasMessage)
   await postToSlack(ontarioMessage)
 }
 
-function getOntarioCovidTracking(lookback) {
+function getOntarioCovidTracking(daysToLookBack=0) {
   return new Promise(resolve => {
 const date = new Date()
 
-	  if (lookback > 0) {
-    date.setDate(date.getDate() - lookback)
-	  }
+    date.setDate(date.getDate() - daysToLookBack)
     const urlDate = date.toISOString().replace(/T.*Z/, "T00:00:00")
     const url = `https://data.ontario.ca/api/3/action/datastore_search?q=${urlDate}&resource_id=ed270bb8-340b-41f9-a7c6-e8ef587e6d11`
-  https.get(url, resp => {
+    https.get(url, resp => {
       let data = ''
       resp.on('data', chunk => data += chunk)
       resp.on('end', () => resolve(JSON.parse(data)))
-    }).on('error', (e) => {
-  console.error(e);
-})
+    })
   })
 }
 

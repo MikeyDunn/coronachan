@@ -16,29 +16,14 @@ module.exports.getTexasMessage = (data) => {
 
 }
 
-module.exports.getOntarioMessage = (data2,data1) => {
-	console.log(data1.fields[5].id)
-  const positiveIncrease = (data2.records[0][data2.fields[5].id]-data1.records[0][data1.fields[5].id])
-	console.log(positiveIncrease)
-	console.log(data1.fields[7].id)
-  const deathIncrease =  (data2.records[0][data2.fields[7].id]-data1.records[0][data1.fields[7].id])
-	console.log(deathIncrease)
-	console.log(data1.fields[14].id)
-  const icuIncrease =  (data2.records[0][data2.fields[14].id]-data1.records[0][data1.fields[14].id])
-	console.log(icuIncrease)
+module.exports.getOntarioMessage = (newData,previousData) => {
+  const positiveIncrease = (newData.records[0][newData.fields[5].id]-previousData.records[0][previousData.fields[5].id])
+  const deathIncrease =  (newData.records[0][newData.fields[7].id]-previousData.records[0][previousData.fields[7].id])
+  const icuIncrease =  (newData.records[0][newData.fields[14].id]-previousData.records[0][previousData.fields[14].id])
   
-
   const messageArr = [
-    `rawr! I hawent fowgot abouout you Ontario Sama !!! notices your bulgy wolgy, *${positiveIncrease}* new cases, you're so big :O \n` +
-    `rubbies ;) *${deathIncrease}* deaths, it doesn't stop gwowing \n` +
-    `your icu increased by *${icuIncrease}* :ew alweady mmmm~ \n` +
-    `things awe wooking pwetty fuckywucky~ come back tommowo squirms pwetty pwease`,
-
-    `Nyaah! I hawent fowgot abouout you Ontario Kun!!! Yur Fwends are still dyiiiing *${deathIncrease}* (＾ワ＾)` +
-    `*${positiveIncrease}* new cases means DOOOMMMM!!!` +
-    `Hehe ^_^ *${icuIncrease}* increase in your icu, so random!` +
-    `newayz toodles!!!!`
-
+    `I hawent fowgot abouout you Ontawio Sama!!! *${positiveIncrease}* new kawaises , *${deathIncrease}* deaths and *${icuIncrease}* more in icu is giving me double duty :O but i can handle it~~`, 
+	  `Ontawio Sama ^w^  I have you nyew statistics tuou ｡◕ ‿ ◕｡. I'm twacking *${positiveIncrease} nyew confiwmed kwaises, ${deathIncrease} deaths (◠﹏◠✿), ${icuIncrease} additions to the icu`
   ]
 
   return messageArr[Math.floor(Math.random() * messageArr.length)]
