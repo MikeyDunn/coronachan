@@ -46,10 +46,10 @@ module.exports.getComparisonMessage = (texasData, ontarioData, texasPopulationDa
       ontarioPopulation = parseInt(ontarioPopulationData.queryresult.pods[1].subpods[0].plaintext.split(" ")[0],10) * 1000000 
   }
 
-  const texasCasePercentage = texasCasesTotal/texasPopulation
-  const ontarioCasePercentage = ontarioCasesTotal/ontarioPopulation
-  const texasDeathPercentage = texasDeathTotal/texasPopulation
-  const ontarioDeathPercentage = ontarioDeathTotal/ontarioPopulation
+  const texasCasePercentage = (texasCasesTotal/texasPopulation) * 100
+  const ontarioCasePercentage = (ontarioCasesTotal/ontarioPopulation) * 100
+  const texasDeathPercentage = (texasDeathTotal/texasPopulation) * 100
+  const ontarioDeathPercentage = (ontarioDeathTotal/ontarioPopulation) * 100
   const messageArr = [
 	  `Oh wow Texas San *${texasCasePercentage.toFixed(5)}%* of youw popuwation cases so much mowe then Ontawio Sama *${ontarioCasePercentage.toFixed(5)}%* youw so big. 
 and *${texasDeathPercentage.toFixed(5)}%* of texas sans popuwation has died oh nyo but ontawio sama is catching up with *${ontarioDeathPercentage.toFixed(5)}%*.`
