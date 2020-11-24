@@ -11,35 +11,57 @@ module.exports.handler = async event => {
   const covidOntarioYesterdayTrackingPromise = getOntarioCovidTracking(2)
   const covidTrackingPromise = getTexasCovidTracking()
   const healthDataPromise = getTexasHealthData()
+  const wolfTexasPromise = askWolf("What is the Population of Texas?")
+  const wolfOntarioPromise = askWolf("What is the Population of Ontario?")
   const [
     covidTrackingData,
     healthData,
     ontarioTData,
-    ontarioYData
+    ontarioYData,
+    wolfTexasData,
+    wolfOntarioData
   ] = await Promise.all([
     covidTrackingPromise,
     healthDataPromise,
     covidOntarioTodayTrackingPromise,
-    covidOntarioYesterdayTrackingPromise
+    covidOntarioYesterdayTrackingPromise,
+    wolfTexasPromise,
+    wolfOntarioPromise
   ])
 
   // generate messaging
   const texasMessage = templates.getTexasMessage({ ...covidTrackingData, ...healthData })
   const ontarioMessage = templates.getOntarioMessage(ontarioTData.result, ontarioYData.result)
 
+   const raceToTheBottomMessage = templates.getComparisonMessage(covidTrackingData, ontarioTData.result, wolfTexasData, wolfOntarioData)
   // post to slack
   await postToSlack(texasMessage)
   await postToSlack(ontarioMessage)
+  await postToSlack(raceToTheBottomMessage)	
 }
 
 function getOntarioCovidTracking(daysToLookBack = 0) {
   return new Promise(resolve => {
-    const date = new Date()
-
-    date.setDate(date.getDate() - daysToLookBack)
-
-    const urlDate = date.toISOString().replace(/T.*Z/, "T00:00:00")
+    var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    var localISOTime = (new Date(Date.now() - tzoffset - daysToLookBack*86400000))
+    const urlDate = localISOTime.toISOString().replace(/T.*Z/, "T00:00:00")
     const url = `https://data.ontario.ca/api/3/action/datastore_search?q=${urlDate}&resource_id=ed270bb8-340b-41f9-a7c6-e8ef587e6d11`
+
+    https.get(url, resp => {
+      let data = ''
+
+      resp.on('data', chunk => data += chunk)
+      resp.on('end', () => resolve(JSON.parse(data)))
+    })
+  })
+}
+
+function askWolf(input) {
+  return new Promise(resolve => {
+    const wolfID =  ""
+
+    input = input.replace(/\s/g,'+')
+    const url = `https://api.wolframalpha.com/v2/query?input=${input}&format=moutput&format=plaintext&output=json&appid=${wolfID}`
 
     https.get(url, resp => {
       let data = ''
@@ -52,11 +74,11 @@ function getOntarioCovidTracking(daysToLookBack = 0) {
 
 function getTexasCovidTracking() {
   return new Promise(resolve => {
-    const date = new Date()
 
-    date.setDate(date.getDate() - 1)
+    var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    var localISOTime = (new Date(Date.now() - tzoffset - 86400000))
 
-    const urlDate = date.toISOString().split('T')[0].replace(/-/g, '')
+    const urlDate = localISOTime.toISOString().split('T')[0].replace(/-/g, '')
     const url = `https://api.covidtracking.com/v1/states/tx/${urlDate}.json`
 
     https.get(url, resp => {
