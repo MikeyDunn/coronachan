@@ -35,10 +35,9 @@ module.exports.handler = async event => {
 
    const raceToTheBottomMessage = templates.getComparisonMessage(covidTrackingData, ontarioTData.result, wolfTexasData, wolfOntarioData)
   // post to slack
- // await postToSlack(texasMessage)
- // await postToSlack(ontarioMessage)
- // await postToSlack(raceToTheBottomMessage)	
-  console.log(raceToTheBottomMessage)
+   await postToSlack(texasMessage)
+   await postToSlack(ontarioMessage)
+   await postToSlack(raceToTheBottomMessage)	
 }
 
 function getOntarioCovidTracking(daysToLookBack = 0) {
