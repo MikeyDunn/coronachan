@@ -51,7 +51,7 @@ module.exports.getComparisonMessage = (texasData, ontarioData, texasPopulationDa
   const texasDeathPercentage = (texasDeathTotal/texasPopulation) * 100
   const ontarioDeathPercentage = (ontarioDeathTotal/ontarioPopulation) * 100
   const messageArr = [
-	  `Oh wow Texas San *${texasCasePercentage.toFixed(5)}%* of youw popuwation cases so much mowe then Ontawio Sama *${ontarioCasePercentage.toFixed(5)}%* youw so big. 
+	  `Oh wow Texas San *${texasCasePercentage.toFixed(5)}%* of youw popuwation have covid so much mowe then Ontawio Sama *${ontarioCasePercentage.toFixed(5)}%* youw so big. 
 and *${texasDeathPercentage.toFixed(5)}%* of texas sans popuwation has died oh nyo but ontawio sama is catching up with *${ontarioDeathPercentage.toFixed(5)}%*.`
   ]
 
