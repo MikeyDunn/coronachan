@@ -5,40 +5,24 @@ const SLACK_WEBHOOK_PATH = process.env.SLACK_WEBHOOK_PATH
 const https = require('https')
 const templates = require('./templates')
 
-module.exports.handler = async event => {
+module.exports.handler = async () => {
   // request data
-  const covidOntarioTodayTrackingPromise = getOntarioCovidTracking(1)
-  const covidOntarioYesterdayTrackingPromise = getOntarioCovidTracking(2)
+  const covidOntarioTodayTrackingPromise = getOntarioCovidTracking(0)
   const covidTrackingPromise = getTexasCovidTracking()
-  const healthDataPromise = getTexasHealthData()
-  const [
-    covidTrackingData,
-    healthData,
-    ontarioTData,
-    ontarioYData
-  ] = await Promise.all([
-    covidTrackingPromise,
-    healthDataPromise,
-    covidOntarioTodayTrackingPromise,
-    covidOntarioYesterdayTrackingPromise
-  ])
+  const [covidTrackingData, ontarioTData] = await Promise.all([covidTrackingPromise, covidOntarioTodayTrackingPromise])
 
   // generate messaging
-  const texasMessage = templates.getTexasMessage({ ...covidTrackingData, ...healthData })
-  const ontarioMessage = templates.getOntarioMessage(ontarioTData.result, ontarioYData.result)
+  const raceToTheBottomMessage = templates.getComparisonMessage(covidTrackingData, ontarioTData.result)
 
   // post to slack
-  await postToSlack(texasMessage)
-  await postToSlack(ontarioMessage)
+  await postToSlack(raceToTheBottomMessage)
 }
 
 function getOntarioCovidTracking(daysToLookBack = 0) {
   return new Promise(resolve => {
-    const date = new Date()
-
-    date.setDate(date.getDate() - daysToLookBack)
-
-    const urlDate = date.toISOString().replace(/T.*Z/, "T00:00:00")
+    var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    var localISOTime = (new Date(Date.now() - tzoffset - daysToLookBack * 86400000))
+    const urlDate = localISOTime.toISOString().replace(/T.*Z/, "T00:00:00")
     const url = `https://data.ontario.ca/api/3/action/datastore_search?q=${urlDate}&resource_id=ed270bb8-340b-41f9-a7c6-e8ef587e6d11`
 
     https.get(url, resp => {
@@ -52,11 +36,11 @@ function getOntarioCovidTracking(daysToLookBack = 0) {
 
 function getTexasCovidTracking() {
   return new Promise(resolve => {
-    const date = new Date()
 
-    date.setDate(date.getDate() - 1)
+    var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+    var localISOTime = (new Date(Date.now() - tzoffset))
 
-    const urlDate = date.toISOString().split('T')[0].replace(/-/g, '')
+    const urlDate = localISOTime.toISOString().split('T')[0].replace(/-/g, '')
     const url = `https://api.covidtracking.com/v1/states/tx/${urlDate}.json`
 
     https.get(url, resp => {
@@ -64,36 +48,6 @@ function getTexasCovidTracking() {
 
       resp.on('data', chunk => data += chunk)
       resp.on('end', () => resolve(JSON.parse(data)))
-    })
-  })
-}
-
-function getTexasHealthData() {
-  return new Promise(resolve => {
-    const url = 'https://healthdata.gov/dataset/covid-19-estimated-patient-impact-and-hospital-capacity-state/resource/82e733c6-7baa-4c65'
-
-    https.get(url, htmlResp => {
-      let htmlData = ''
-
-      htmlResp.on('data', chunk => htmlData += chunk)
-      htmlResp.on('end', () => {
-        const htmlSplit = htmlData.split('<div class="download"><a href="')[1]
-        const csvUrl = htmlSplit.split('" type="text/csv;')[0]
-
-        https.get(csvUrl, csvResp => {
-          let csvData = ''
-
-          csvResp.on('data', chunk => csvData += chunk)
-          csvResp.on('end', () => {
-            const csvSplit = csvData.split('TX,')
-            const lastSplit = csvSplit[csvSplit.length - 1]
-            const newestTxRecord = lastSplit.split(/\n/)[0]
-            const icuPercentage = newestTxRecord.split(/(?!\B"[^"]*),(?![^"]*"\B)/)[4]
-
-            resolve({ icuPercentage })
-          })
-        })
-      })
     })
   })
 }
