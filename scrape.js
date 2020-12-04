@@ -7,8 +7,8 @@ const templates = require('./templates')
 
 module.exports.handler = async event => {
   // request data
-  const covidOntarioTodayTrackingPromise = getOntarioCovidTracking(1)
-  const covidOntarioYesterdayTrackingPromise = getOntarioCovidTracking(2)
+  const covidOntarioTodayTrackingPromise = getOntarioCovidTracking(0)
+  const covidOntarioYesterdayTrackingPromise = getOntarioCovidTracking(1)
   const covidTrackingPromise = getTexasCovidTracking()
   const healthDataPromise = getTexasHealthData()
   const wolfTexasPromise = askWolf("What is the Population of Texas?")
@@ -76,7 +76,7 @@ function getTexasCovidTracking() {
   return new Promise(resolve => {
 
     var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-    var localISOTime = (new Date(Date.now() - tzoffset - 86400000))
+    var localISOTime = (new Date(Date.now() - tzoffset))
 
     const urlDate = localISOTime.toISOString().split('T')[0].replace(/-/g, '')
     const url = `https://api.covidtracking.com/v1/states/tx/${urlDate}.json`

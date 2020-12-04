@@ -36,7 +36,6 @@ module.exports.getComparisonMessage = (texasData, ontarioData, texasPopulationDa
   const ontarioCasesTotal = ontarioData.records[0][ontarioData.fields[8].id]
   const texasDeathTotal = texasData.death
   const ontarioDeathTotal = ontarioData.records[0][ontarioData.fields[7].id]
-  
   let texasPopulation = 29000000
   if (typeof(texasPopulationData.queryresult.pods) !== 'undefined') {
      texasPopulation =  parseInt(texasPopulationData.queryresult.pods[1].subpods[0].plaintext.split(" ")[0],10) * 1000000
@@ -51,8 +50,7 @@ module.exports.getComparisonMessage = (texasData, ontarioData, texasPopulationDa
   const texasDeathPercentage = (texasDeathTotal/texasPopulation) * 100
   const ontarioDeathPercentage = (ontarioDeathTotal/ontarioPopulation) * 100
   const messageArr = [
-	  `Oh wow Texas San *${texasCasePercentage.toFixed(5)}%* of youw popuwation have covid so much mowe then Ontawio Sama *${ontarioCasePercentage.toFixed(5)}%* youw so big. 
-and *${texasDeathPercentage.toFixed(5)}%* of texas sans popuwation has died oh nyo but ontawio sama is catching up with *${ontarioDeathPercentage.toFixed(5)}%*.`
+	  `:texas: *${texasCasePercentage.toFixed(5)}%* :cough1::cough2:\n:maple_leaf: *${ontarioCasePercentage.toFixed(5)}%* :cough1::cough2:\n:texas: *${texasDeathPercentage.toFixed(5)}%* :skull:\n:maple_leaf: *${ontarioDeathPercentage.toFixed(5)}%* :skull:`
   ]
 
   return messageArr[Math.floor(Math.random() * messageArr.length)]
