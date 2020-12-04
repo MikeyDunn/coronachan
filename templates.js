@@ -15,9 +15,9 @@ module.exports.getTexasMessage = (data) => {
 }
 
 module.exports.getOntarioMessage = (newData, previousData) => {
-  const positiveIncrease = (newData.records[0][newData.fields[8].id] - previousData.records[0][previousData.fields[8].id])
-  const deathIncrease = (newData.records[0][newData.fields[7].id] - previousData.records[0][previousData.fields[7].id])
-  const icuIncrease = (newData.records[0][newData.fields[14].id] - previousData.records[0][previousData.fields[14].id])
+  const positiveIncrease = (newData.records[newData.records.length-1][newData.fields[8].id] - previousData.records[0][previousData.fields[8].id])
+  const deathIncrease = (newData.records[newData.records.length-1][newData.fields[7].id] - previousData.records[0][previousData.fields[7].id])
+  const icuIncrease = (newData.records[newData.records.length-1][newData.fields[14].id] - previousData.records[0][previousData.fields[14].id])
 
   const messageArr = [
     `I hawent fowgot abouout you Ontawio Sama!!! \n` +
@@ -33,9 +33,9 @@ module.exports.getOntarioMessage = (newData, previousData) => {
 
 module.exports.getComparisonMessage = (texasData, ontarioData, texasPopulationData, ontarioPopulationData) => {
   const texasCasesTotal = texasData.positive
-  const ontarioCasesTotal = ontarioData.records[0][ontarioData.fields[8].id]
+  const ontarioCasesTotal = ontarioData.records[ontarioData.records.length-1][ontarioData.fields[8].id]
   const texasDeathTotal = texasData.death
-  const ontarioDeathTotal = ontarioData.records[0][ontarioData.fields[7].id]
+  const ontarioDeathTotal = ontarioData.records[ontarioData.records.length-1][ontarioData.fields[7].id]
   let texasPopulation = 29000000
   if (typeof(texasPopulationData.queryresult.pods) !== 'undefined') {
      texasPopulation =  parseInt(texasPopulationData.queryresult.pods[1].subpods[0].plaintext.split(" ")[0],10) * 1000000
